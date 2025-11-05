@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drawaria2.io - Multiplayer Drawing & Guessing Game</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/game.css">
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Fredoka+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="logo">
+            <div class="logo-icon">🎨</div>
+            <h1>Drawaria2.io</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#home" class="active">Home</a></li>
+                <li><a href="#how-to-play">How to Play</a></li>
+                <li><a href="#leaderboard">Leaderboard</a></li>
+                <li><a href="#store">Store</a></li>
+                <li><a href="#rewards">Rewards</a></li>
+            </ul>
+        </nav>
+        <div class="user-actions">
+            <div id="userInfo" class="hidden">
+                <span id="usernameDisplay"></span>
+                <div class="points-display">
+                    <span id="pointsCount">0</span> Points
+                    <span id="jkCoinsCount" class="jk-coins">0 JK Coins</span>
+                </div>
+                <button id="logoutBtn" class="btn btn-secondary">Logout</button>
+            </div>
+            <div id="guestActions">
+                <button class="btn btn-secondary" id="loginBtn"><i class="fas fa-sign-in-alt"></i> Login</button>
+                <button class="btn btn-primary" id="registerBtn"><i class="fas fa-user-plus"></i> Register</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section class="hero" id="home">
+            <div class="hero-content">
+                <h2>Draw, Guess & Win Real Rewards!</h2>
+                <p>The ultimate multiplayer drawing and guessing game for kids. Be creative, have fun, and earn points for cash prizes!</p>
+                <div class="hero-buttons">
+                    <button class="btn btn-primary" id="playNowBtn"><i class="fas fa-play-circle"></i> Play Now</button>
+                    <button class="btn btn-secondary" id="createRoomBtn"><i class="fas fa-plus-circle"></i> Create Room</button>
+                    <button class="btn btn-warning" id="joinRoomBtn"><i class="fas fa-door-open"></i> Join Room</button>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="game-preview">
+                    <div class="canvas-preview"></div>
+                    <div class="players-preview">
+                        <div class="player">Player1</div>
+                        <div class="player">Player2</div>
+                        <div class="player">Player3</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How to Play Section -->
+        <section class="how-to-play" id="how-to-play">
+            <h2>How to Play Drawaria2.io</h2>
+            <div class="rules-container">
+                <div class="rule-card">
+                    <div class="rule-icon">1</div>
+                    <h3>Join or Create a Room</h3>
+                    <p>Enter a public room or create your own private game with friends using a room code.</p>
+                </div>
+                <div class="rule-card">
+                    <div class="rule-icon">2</div>
+                    <h3>Take Turns Drawing</h3>
+                    <p>When it's your turn, you'll get a word to draw. Use the drawing tools to create your masterpiece.</p>
+                </div>
+                <div class="rule-card">
+                    <div class="rule-icon">3</div>
+                    <h3>Guess the Word</h3>
+                    <p>While others are drawing, type your guesses in the chat. The faster you guess, the more points you earn!</p>
+                </div>
+                <div class="rule-card">
+                    <div class="rule-icon">4</div>
+                    <h3>Earn Points & Rewards</h3>
+                    <p>Collect points for correct guesses and when your drawings are guessed. Top players win cash prizes!</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Game Rooms Section -->
+        <section class="game-rooms">
+            <h2>Available Game Rooms</h2>
+            <div class="rooms-container">
+                <div class="room-card">
+                    <h3>Public Room #1</h3>
+                    <div class="room-info">
+                        <span class="players-count"><i class="fas fa-users"></i> 4/8</span>
+                        <span class="room-status">Waiting</span>
+                    </div>
+                    <button class="btn btn-primary join-room-btn">Join Room</button>
+                </div>
+                <div class="room-card">
+                    <h3>Kids Only Room</h3>
+                    <div class="room-info">
+                        <span class="players-count"><i class="fas fa-users"></i> 6/8</span>
+                        <span class="room-status">In Game</span>
+                    </div>
+                    <button class="btn btn-primary join-room-btn">Join Room</button>
+                </div>
+                <div class="room-card">
+                    <h3>Beginner's Room</h3>
+                    <div class="room-info">
+                        <span class="players-count"><i class="fas fa-users"></i> 2/8</span>
+                        <span class="room-status">Waiting</span>
+                    </div>
+                    <button class="btn btn-primary join-room-btn">Join Room</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Leaderboard Section -->
+        <section class="leaderboard-section" id="leaderboard">
+            <h2>Monthly Leaderboard</h2>
+            <div class="leaderboard-container">
+                <table class="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Player</th>
+                            <th>Points</th>
+                            <th>Drawings</th>
+                            <th>Correct Guesses</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboardBody">
+                        <!-- Leaderboard data will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Rewards Section -->
+        <section class="rewards-section" id="rewards">
+            <h2>Monthly Rewards</h2>
+            <div class="rewards-container">
+                <div class="reward-card gold">
+                    <div class="reward-icon">🥇</div>
+                    <h3>1st Place</h3>
+                    <p class="reward-price">$5 Cash Prize</p>
+                    <p>Plus exclusive golden badge and 500 bonus points</p>
+                </div>
+                <div class="reward-card silver">
+                    <div class="reward-icon">🥈</div>
+                    <h3>2nd Place</h3>
+                    <p class="reward-price">$2 Cash Prize</p>
+                    <p>Plus exclusive silver badge and 300 bonus points</p>
+                </div>
+                <div class="reward-card bronze">
+                    <div class="reward-icon">🥉</div>
+                    <h3>3rd Place</h3>
+                    <p class="reward-price">$1 Cash Prize</p>
+                    <p>Plus exclusive bronze badge and 200 bonus points</p>
+                </div>
+            </div>
+            <div class="points-system">
+                <h3>Points & JK Coins System</h3>
+                <div class="points-info">
+                    <div class="point-item">
+                        <i class="fas fa-star"></i>
+                        <div>
+                            <h4>Points</h4>
+                            <p>Earn points by playing games. These determine your leaderboard position and monthly rewards.</p>
+                        </div>
+                    </div>
+                    <div class="point-item">
+                        <i class="fas fa-coins"></i>
+                        <div>
+                            <h4>JK Coins</h4>
+                            <p>Premium currency that will have future value. Can be used for special items and features.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Store Section (Disabled for now) -->
+        <section class="store-section" id="store">
+            <h2>Drawaria2 Store <span class="coming-soon">(Coming Soon)</span></h2>
+            <div class="store-disabled">
+                <i class="fas fa-store-slash"></i>
+                <h3>Store Temporarily Disabled</h3>
+                <p>The store feature is currently being developed and will be available soon. Here you'll be able to:</p>
+                <ul>
+                    <li>Buy special brushes and drawing tools</li>
+                    <li>Purchase unique colors and effects</li>
+                    <li>Sell your own created content (after verification)</li>
+                    <li>Trade items with other players</li>
+                </ul>
+                <p class="security-note">All transactions will be verified by our team within 24 hours to ensure security and prevent fraud.</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Drawaria2.io</h3>
+                <p>A fun, safe, and educational drawing game for kids. Creativity meets competition!</p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#how-to-play">How to Play</a></li>
+                    <li><a href="#leaderboard">Leaderboard</a></li>
+                    <li><a href="#store">Store</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Support</h3>
+                <ul>
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">Parent Guide</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">Report Issue</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Legal</h3>
+                <ul>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Cookie Policy</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2023 Drawaria2.io. All rights reserved. Designed for kids' safety and enjoyment.</p>
+        </div>
+    </footer>
+
+    <!-- Game Modal -->
+    <div id="gameModal" class="modal">
+        <div class="modal-content game-modal">
+            <div class="modal-header">
+                <h2>Drawaria2 Game Room</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="game-container">
+                <div class="players-panel">
+                    <h3>Players</h3>
+                    <div id="playersList" class="players-list">
+                        <!-- Players will be added here dynamically -->
+                    </div>
+                    <div class="game-settings">
+                        <h3>Room Settings</h3>
+                        <div class="setting-item">
+                            <label>Rounds: <span id="roundsCount">3</span></label>
+                            <input type="range" id="roundsSlider" min="1" max="5" value="3">
+                        </div>
+                        <div class="setting-item">
+                            <label>Draw Time: <span id="timeCount">80</span>s</label>
+                            <input type="range" id="timeSlider" min="30" max="120" value="80" step="10">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="game-area">
+                    <div class="game-info">
+                        <div class="current-player">Current Drawer: <span id="currentDrawer">-</span></div>
+                        <div class="timer">Time Left: <span id="gameTimer">80</span>s</div>
+                        <div class="round-info">Round <span id="currentRound">1</span> of <span id="totalRounds">3</span></div>
+                    </div>
+                    
+                    <div class="drawing-container">
+                        <canvas id="drawingCanvas" width="800" height="500"></canvas>
+                        <div class="drawing-tools">
+                            <div class="tool-group">
+                                <button class="tool-btn active" data-tool="pen"><i class="fas fa-pen"></i></button>
+                                <button class="tool-btn" data-tool="eraser"><i class="fas fa-eraser"></i></button>
+                                <button class="tool-btn" data-tool="fill"><i class="fas fa-fill-drip"></i></button>
+                            </div>
+                            <div class="tool-group">
+                                <input type="color" id="colorPicker" value="#000000">
+                                <input type="range" id="brushSize" min="1" max="50" value="5">
+                                <span id="brushSizeValue">5px</span>
+                            </div>
+                            <div class="tool-group">
+                                <button class="tool-btn" id="clearCanvas"><i class="fas fa-trash"></i> Clear</button>
+                                <button class="tool-btn" id="undoBtn"><i class="fas fa-undo"></i> Undo</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="word-to-draw">
+                        <h3>Word to Draw: <span id="currentWord">_______</span></h3>
+                    </div>
+                </div>
+                
+                <div class="chat-panel">
+                    <h3>Game Chat</h3>
+                    <div id="chatMessages" class="chat-messages">
+                        <div class="system-message">Welcome to the game! Guess the word to earn points.</div>
+                    </div>
+                    <div class="chat-input-container">
+                        <input type="text" id="chatInput" placeholder="Type your guess here...">
+                        <button id="sendChatBtn"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                    <div class="score-display">
+                        <div>Your Score: <span id="playerScore">0</span></div>
+                        <div>Players Guessed: <span id="playersGuessed">0/0</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Login to Drawaria2</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginUsername">Username</label>
+                    <input type="text" id="loginUsername" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+            </form>
+            <p style="text-align: center; margin-top: 1rem;">Don't have an account? <a href="#" id="switchToRegister">Register here</a></p>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Create Your Drawaria2 Account</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="registerUsername">Username</label>
+                    <input type="text" id="registerUsername" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Password</label>
+                    <input type="password" id="registerPassword" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="parentEmail">Parent's Email (for rewards verification)</label>
+                    <input type="email" id="parentEmail" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="ageVerification" required>
+                        I confirm I am under 18 or have parental permission to play
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Create Account</button>
+            </form>
+            <p style="text-align: center; margin-top: 1rem;">Already have an account? <a href="#" id="switchToLogin">Login here</a></p>
+        </div>
+    </div>
+
+    <!-- AFK Warning Modal -->
+    <div id="afkModal" class="modal">
+        <div class="modal-content afk-modal">
+            <div class="afk-header">
+                <i class="fas fa-clock"></i>
+                <h2>Are You Still There?</h2>
+            </div>
+            <p>You've been inactive for a while. Please confirm you're still playing.</p>
+            <div class="afk-timer">
+                Returning to lobby in: <span id="afkCountdown">5</span> seconds
+            </div>
+            <div class="afk-actions">
+                <button class="btn btn-primary" id="stayInGame">I'm Still Playing!</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ad Modal -->
+    <div id="adModal" class="modal">
+        <div class="modal-content ad-modal">
+            <div class="ad-header">
+                <h2>Advertisement</h2>
+                <div class="ad-timer">Ad ends in: <span id="adCountdown">15</span>s</div>
+            </div>
+            <div class="ad-content">
+                <div class="ad-placeholder">
+                    <i class="fas fa-ad"></i>
+                    <p>This is a placeholder for a kid-friendly advertisement</p>
+                    <p>Watching ads helps support our game and rewards program</p>
+                </div>
+            </div>
+            <div class="ad-actions">
+                <button class="btn btn-secondary" id="skipAdBtn" disabled>Skip Ad <span id="skipTimer">5</span>s</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/main.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/chat.js"></script>
+    <script src="js/security.js"></script>
+</body>
+</html>
