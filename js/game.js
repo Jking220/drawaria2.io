@@ -1,4 +1,4 @@
-// Game functionality for Drawaria2.io
+empty.txt was empty and here game.js , // Game functionality for Drawaria2.io
 
 // Game state
 let gameState = {
@@ -130,6 +130,7 @@ function setActiveTool(tool) {
             break;
     }
 }
+
 // Start drawing
 function startDrawing(e) {
     if (!gameState.gameStarted || gameState.currentDrawer !== Drawaria2.getCurrentUser().username) {
@@ -254,7 +255,6 @@ function undoDrawing() {
     }
 }
 
-
 // Initialize players list
 function initializePlayers() {
     const playersList = document.getElementById('playersList');
@@ -376,7 +376,149 @@ function startRound() {
     addSystemMessage(`Round ${gameState.round} started! ${gameState.currentDrawer} is drawing.`);
 }
 
+// Select a word for drawing
+function selectWord() {
+    // Sample word list
+    const words = [
+        'Elephant', 'Sunflower', 'Bicycle', 'Pizza', 'Rainbow',
+        'Butterfly', 'Castle', 'Dragon', 'Ice Cream', 'Robot',
+        'Treehouse', 'Kite', 'Guitar', 'Ocean', 'Rocket'
+    ];
+    
+    // Select a random word
+    const randomIndex = Math.floor(Math.random() * words.length);
+    gameState.currentWord = words[randomIndex];
+    
+    // Display the word (only to the drawer)
+    document.getElementById('currentWord').textContent = gameState.currentWord;
+}
 
+// Start the timer
+function startTimer() {
+    clearInterval(gameState.timer);
+    
+    gameState.timer = setInterval(() => {
+        gameState.timeLeft--;
+        document.getElementById('gameTimer').textContent = gameState.timeLeft;
+        
+        if (gameState.timeLeft <= 0) {
+            endRound();
+        }
+    }, 1000);
+}
+
+// End the round
+function endRound() {
+    clearInterval(gameState.timer);
+    
+    // Add system message
+    addSystemMessage(`Time's up! The word was: ${gameState.currentWord}`);
+    
+    // Move to next round or end game
+    if (gameState.round < gameState.totalRounds) {
+        gameState.round++;
+        document.getElementById('currentRound').textContent = gameState.round;
+        
+        // Select next drawer
+        selectNextDrawer();
+        
+        // Start next round after a delay
+        setTimeout(startRound, 3000);
+    } else {
+        endGame();
+    }
+}
+
+// Select next drawer
+function selectNextDrawer() {
+    const currentIndex = gameState.players.findIndex(p => p.username === gameState.currentDrawer);
+    const nextIndex = (currentIndex + 1) % gameState.players.length;
+    gameState.currentDrawer = gameState.players[nextIndex].username;
+    
+    document.getElementById('currentDrawer').textContent = gameState.currentDrawer;
+    updateDrawerIndicator();
+}
+
+// End the game
+function endGame() {
+    gameState.gameStarted = false;
+    
+    // Calculate winner
+    const winner = gameState.players.reduce((prev, current) => 
+        (prev.score > current.score) ? prev : current
+    );
+    
+    // Add system message
+    addSystemMessage(`Game over! ${winner.username} wins with ${winner.score} points!`);
+    
+    // Update scores in UI
+    updateScores();
+    
+    // Show game over message
+    setTimeout(() => {
+        alert(`Game Over! ${winner.username} is the winner!`);
+    }, 1000);
+}
+
+// Update scores in UI
+function updateScores() {
+    document.querySelectorAll('.player-item').forEach(item => {
+        const playerName = item.querySelector('.player-name').textContent;
+        const playerScore = item.querySelector('.player-score');
+        const player = gameState.players.find(p => p.username === playerName);
+        
+        if (player) {
+            // Add some random points for demo
+            player.score += Math.floor(Math.random() * 100) + 50;
+            playerScore.textContent = player.score;
+        }
+    });
+    
+    // Update player's own score display
+    document.getElementById('playerScore').textContent = 
+        gameState.players.find(p => p.username === Drawaria2.getCurrentUser().username).score;
+}
+
+// Add system message to chat
+function addSystemMessage(message) {
+    const chatMessages = document.getElementById('chatMessages');
+    const messageElement = document.createElement('div');
+    messageElement.className = 'chat-message system';
+    messageElement.innerHTML = `
+        <div class="message-content">${message}</div>
+        <div class="message-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+    `;
+    
+    chatMessages.appendChild(messageElement);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+// Handle correct guess
+function handleCorrectGuess(guesser) {
+    // Calculate points based on time left
+    const points = Math.floor(gameState.timeLeft / 10) * 10 + 50;
+    
+    // Update player score
+    const player = gameState.players.find(p => p.username === guesser);
+    if (player) {
+        player.score += points;
+    }
+    
+    // Update drawer score
+    const drawer = gameState.players.find(p => p.username === gameState.currentDrawer);
+    if (drawer) {
+        drawer.score += Math.floor(points / 2);
+    }
+    
+    // Add correct guess message
+    addCorrectGuessMessage(guesser, gameState.currentWord, points);
+    
+    // Update UI
+    updateScores();
+    
+    // End round early
+    endRound();
+}
 
 // Add correct guess message
 function addCorrectGuessMessage(guesser, word, points) {
@@ -393,286 +535,8 @@ function addCorrectGuessMessage(guesser, word, points) {
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
-
-// ===============================
-// FUTURE MULTIPLAYER FUNCTIONS
-// ===============================
-
-// Update players from server
-function updatePlayers(players) {
-    gameState.players = players;
-
-    const playersList = document.getElementById('playersList');
-    playersList.innerHTML = '';
-
-    players.forEach(player => {
-        addPlayerToUI(
-            player.username,
-            player.username === Drawaria2.getCurrentUser().username
-        );
-    });
-
-    updateDrawerIndicator();
-}
-
-
-// Add new player
-function addPlayer(username) {
-
-    // Prevent duplicates
-    const exists = gameState.players.some(
-        player => player.username === username
-    );
-
-    if (exists) return;
-
-
-    const newPlayer = {
-        username: username,
-        score: 0,
-        isDrawer: false
-    };
-
-
-    gameState.players.push(newPlayer);
-
-
-    addPlayerToUI(username);
-
-
-    addSystemMessage(
-        `${username} joined the room`
-    );
-}
-
-
-// Remove player
-function removePlayer(username) {
-
-    gameState.players =
-        gameState.players.filter(
-            player => player.username !== username
-        );
-
-
-    const playersList =
-        document.getElementById('playersList');
-
-
-    playersList.innerHTML = '';
-
-
-    gameState.players.forEach(player => {
-
-        addPlayerToUI(
-            player.username,
-            player.username === Drawaria2.getCurrentUser().username
-        );
-
-    });
-
-
-    addSystemMessage(
-        `${username} left the room`
-    );
-}
-
-
-// Receive drawing data
-function receiveDrawing(data) {
-
-    if (!gameState.ctx) return;
-
-
-    const {
-        x1,
-        y1,
-        x2,
-        y2,
-        color,
-        size,
-        tool
-    } = data;
-
-
-    gameState.ctx.lineJoin = 'round';
-    gameState.ctx.lineCap = 'round';
-
-
-    if (tool === 'eraser') {
-
-        gameState.ctx.strokeStyle = 'white';
-        gameState.ctx.lineWidth = size * 2;
-
-    } else {
-
-        gameState.ctx.strokeStyle = color;
-        gameState.ctx.lineWidth = size;
-
-    }
-
-
-    gameState.ctx.beginPath();
-
-    gameState.ctx.moveTo(
-        x1,
-        y1
-    );
-
-    gameState.ctx.lineTo(
-        x2,
-        y2
-    );
-
-    gameState.ctx.stroke();
-}
-
-
-// Send drawing data
-function sendDrawing(data) {
-
-    /*
-        Future WebSocket implementation:
-
-        socket.send(JSON.stringify({
-            type:"drawing",
-            data:data
-        }));
-
-    */
-
-    console.log(
-        "Drawing data:",
-        data
-    );
-}
-
-
-// Resize canvas for fullscreen/mobile
-function resizeCanvas() {
-
-    if (!gameState.canvas) return;
-
-
-    const oldCanvas =
-        gameState.canvas.toDataURL();
-
-
-    const rect =
-        gameState.canvas.getBoundingClientRect();
-
-
-    gameState.canvas.width =
-        rect.width * window.devicePixelRatio;
-
-
-    gameState.canvas.height =
-        rect.height * window.devicePixelRatio;
-
-
-    const img = new Image();
-
-
-    img.onload = function(){
-
-        gameState.ctx.drawImage(
-            img,
-            0,
-            0,
-            gameState.canvas.width,
-            gameState.canvas.height
-        );
-
-    };
-
-
-    img.src = oldCanvas;
-
-}
-
-
-// Fullscreen game mode
-function toggleFullscreen() {
-
-    const gameContainer =
-        document.getElementById('gameModal');
-
-
-    if (!document.fullscreenElement) {
-
-        gameContainer.requestFullscreen()
-        .catch(err => {
-
-            console.log(
-                "Fullscreen error:",
-                err
-            );
-
-        });
-
-    } else {
-
-        document.exitFullscreen();
-
-    }
-
-}
-
-
-// Leave game room
-function leaveGameRoom() {
-
-    clearInterval(
-        gameState.timer
-    );
-
-
-    gameState.gameStarted = false;
-
-
-    gameState.players = [];
-
-
-    const gameModal =
-        document.getElementById('gameModal');
-
-
-    gameModal.style.display = 'none';
-
-
-    addSystemMessage(
-        "You left the game"
-    );
-
-}
-
-
-// Get current game state
-function getGameState() {
-
-    return gameState;
-
-}
-
-
-// Make multiplayer functions available
-
+// Make functions available globally
 window.GameManager = {
-
     initializeGame,
-    handleCorrectGuess,
-    updatePlayers,
-    addPlayer,
-    removePlayer,
-    receiveDrawing,
-    sendDrawing,
-    resizeCanvas,
-    toggleFullscreen,
-    leaveGameRoom,
-    getGameState
-
+    handleCorrectGuess
 };
-
-
-
-
