@@ -1,4 +1,10 @@
-// Chat functionality for Drawaria2.io
+in js folder i found these chat.js
+empty.txt
+game.js
+main.js
+security.js, 
+/////
+chatJS // Chat functionality for Drawaria2.io
 
 // Initialize chat
 function initializeChat() {
@@ -59,7 +65,7 @@ function handleCorrectGuess(guesser) {
     }
 }
 
-// Add player message
+// Add player message to chat
 function addPlayerMessage(sender, message) {
     const chatMessages = document.getElementById('chatMessages');
     const messageElement = document.createElement('div');
@@ -99,6 +105,7 @@ function simulateResponse(message) {
         }, 1000 + Math.random() * 3000);
     }
 }
+
 // Get a random player (for demo)
 function getRandomPlayer() {
     const players = ['ArtMaster123', 'CreativeKid', 'DrawPro', 'SketchWizard'];
@@ -142,5 +149,3 @@ window.ChatManager = {
     sendMessage,
     addPlayerMessage
 };
-
-
