@@ -740,3 +740,881 @@ function handleJoinRoom() {
 }
 
 }
+
+
+
+// Join a game room
+function joinGameRoom(roomName) {
+
+    if (!isLoggedIn) {
+
+        showLoginModal();
+
+        return;
+
+    }
+
+
+
+    // Show the game modal
+
+    gameModal.style.display = 'flex';
+
+
+
+    // Initialize the game
+
+    initializeGame(roomName);
+
+
+
+    // Start AFK monitoring for the game
+
+    startGameAfkMonitoring();
+
+}
+
+
+
+// Create a game room
+function createGameRoom() {
+
+
+    if (!isLoggedIn) {
+
+        showLoginModal();
+
+        return;
+
+    }
+
+
+
+    const roomCode =
+        generateRoomCode();
+
+
+
+    const roomName =
+        `Room ${roomCode}`;
+
+
+
+    // Show the game modal with the new room
+
+    gameModal.style.display = 'flex';
+
+
+
+    // Initialize game as room host
+
+    initializeGame(
+        roomName,
+        true
+    );
+
+
+
+    // Start AFK monitoring
+
+    startGameAfkMonitoring();
+
+
+
+    showSuccessMessage(
+        `Room ${roomCode} created! Share this code with friends: ${roomCode}`
+    );
+
+
+}
+
+
+
+// Generate random room code
+function generateRoomCode() {
+
+
+    return Math.random()
+        .toString(36)
+        .substring(2, 8)
+        .toUpperCase();
+
+
+}
+
+
+
+// Initialize game placeholder
+function initializeGame(
+    roomName,
+    isHost = false
+) {
+
+
+    console.log(
+        `Initializing game in room: ${roomName}, Host: ${isHost}`
+    );
+
+
+    // Game initialization will be handled in game.js
+
+
+}
+
+
+
+// Load leaderboard data
+function loadLeaderboard() {
+
+
+    const leaderboardBody =
+        document.getElementById(
+            'leaderboardBody'
+        );
+
+
+
+    // Sample leaderboard data
+
+    const leaderboardData = [
+
+        {
+            rank: 1,
+            username: 'ArtMaster123',
+            points: 1250,
+            drawings: 45,
+            guesses: 38
+        },
+
+        {
+            rank: 2,
+            username: 'CreativeKid',
+            points: 1120,
+            drawings: 52,
+            guesses: 29
+        },
+
+        {
+            rank: 3,
+            username: 'DrawPro',
+            points: 980,
+            drawings: 38,
+            guesses: 35
+        },
+
+        {
+            rank: 4,
+            username: 'SketchWizard',
+            points: 875,
+            drawings: 41,
+            guesses: 27
+        },
+
+        {
+            rank: 5,
+            username: 'ColorFan',
+            points: 820,
+            drawings: 36,
+            guesses: 31
+        },
+
+        {
+            rank: 6,
+            username: 'QuickDraw',
+            points: 780,
+            drawings: 39,
+            guesses: 28
+        },
+
+        {
+            rank: 7,
+            username: 'GuessMaster',
+            points: 745,
+            drawings: 32,
+            guesses: 33
+        },
+
+        {
+            rank: 8,
+            username: 'DoodleKing',
+            points: 710,
+            drawings: 44,
+            guesses: 24
+        },
+
+        {
+            rank: 9,
+            username: 'PixelArtist',
+            points: 685,
+            drawings: 37,
+            guesses: 26
+        },
+
+        {
+            rank: 10,
+            username: 'InkMaster',
+            points: 650,
+            drawings: 35,
+            guesses: 25
+        }
+
+    ];
+
+
+
+    // Clear existing content
+
+    leaderboardBody.innerHTML = '';
+
+
+
+    // Populate leaderboard
+
+    leaderboardData.forEach(player => {
+
+
+        const row =
+            document.createElement('tr');
+
+
+
+        // Add rank class
+
+        if (player.rank <= 3) {
+
+            row.classList.add(
+                `rank-${player.rank}`
+            );
+
+        }
+
+
+
+        row.innerHTML = `
+
+            <td>
+                <span class="rank-badge">
+                    ${player.rank}
+                </span>
+
+                ${
+                    player.rank <= 3
+                    ? getRankEmoji(player.rank)
+                    : ''
+                }
+
+            </td>
+
+            <td>${player.username}</td>
+
+            <td>${player.points}</td>
+
+            <td>${player.drawings}</td>
+
+            <td>${player.guesses}</td>
+
+        `;
+
+
+
+        leaderboardBody.appendChild(row);
+
+
+    });
+
+
+}
+
+
+
+// Get rank emoji
+function getRankEmoji(rank) {
+
+
+    switch(rank) {
+
+
+        case 1:
+
+            return '🥇';
+
+
+        case 2:
+
+            return '🥈';
+
+
+        case 3:
+
+            return '🥉';
+
+
+        default:
+
+            return '';
+
+
+    }
+
+
+}
+
+
+// Check for daily reward
+function checkDailyReward() {
+
+    const lastRewardDate =
+        localStorage.getItem(
+            'drawaria2_lastRewardDate'
+        );
+
+
+    const today =
+        new Date().toDateString();
+
+
+
+    if (lastRewardDate !== today) {
+
+
+        // Give daily reward
+
+        const dailyReward = 50;
+
+
+
+        userPoints += dailyReward;
+
+
+
+        currentUser.points =
+            userPoints;
+
+
+
+        // Update localStorage
+
+        localStorage.setItem(
+            'drawaria2_lastRewardDate',
+            today
+        );
+
+
+        localStorage.setItem(
+            'drawaria2_user',
+            JSON.stringify(currentUser)
+        );
+
+
+
+        // Update UI
+
+        pointsCount.textContent =
+            userPoints;
+
+
+
+        // Show reward message
+
+        showSuccessMessage(
+            `Daily reward! You received ${dailyReward} points!`
+        );
+
+
+    }
+
+
+}
+
+
+
+// Activity monitoring for AFK detection
+function startActivityMonitoring() {
+
+
+    // Reset activity timer every minute
+
+    setInterval(() => {
+
+
+        const now =
+            Date.now();
+
+
+        const timeSinceLastActivity =
+            now - lastActivity;
+
+
+
+        // If inactive for 5 minutes and in game
+
+        if (
+            timeSinceLastActivity >
+            5 * 60 * 1000 &&
+            gameModal.style.display === 'flex'
+        ) {
+
+
+            showAfkWarning();
+
+
+        }
+
+
+    }, 60 * 1000);
+
+
+
+}
+
+
+
+// Reset activity timer
+function resetActivityTimer() {
+
+
+    lastActivity =
+        Date.now();
+
+
+
+    // If AFK warning is showing cancel it
+
+    if (
+        afkModal.style.display === 'flex'
+    ) {
+
+
+        cancelAfkWarning();
+
+
+    }
+
+
+}
+
+
+
+// Show AFK warning
+function showAfkWarning() {
+
+
+    afkModal.style.display =
+        'flex';
+
+
+
+    let countdown = 5;
+
+
+
+    const countdownElement =
+        document.getElementById(
+            'afkCountdown'
+        );
+
+
+
+    afkTimer =
+        setInterval(() => {
+
+
+            countdown--;
+
+
+
+            countdownElement.textContent =
+                countdown;
+
+
+
+            if (countdown <= 0) {
+
+
+                clearInterval(
+                    afkTimer
+                );
+
+
+                handleAfkTimeout();
+
+
+            }
+
+
+
+        }, 1000);
+
+
+
+}
+
+
+
+// Cancel AFK warning
+function cancelAfkWarning() {
+
+
+    clearInterval(
+        afkTimer
+    );
+
+
+
+    afkModal.style.display =
+        'none';
+
+
+
+    resetActivityTimer();
+
+
+}
+
+
+
+// Handle AFK timeout
+function handleAfkTimeout() {
+
+
+    // Mark player as AFK
+
+    markPlayerAsAfk();
+
+
+
+    // Close game after delay
+
+    setTimeout(() => {
+
+
+        gameModal.style.display =
+            'none';
+
+
+
+        showInfoMessage(
+            'You were removed from the game due to inactivity.'
+        );
+
+
+    }, 2000);
+
+
+
+}
+
+
+
+// Mark player as AFK
+function markPlayerAsAfk() {
+
+
+    console.log(
+        'Player marked as AFK'
+    );
+
+
+    // Server implementation later
+
+
+}
+
+
+
+// Show ad modal
+function showAdModal() {
+
+
+    if (!isLoggedIn) {
+
+
+        displayAd();
+
+
+    } else {
+
+
+        const playTime =
+            Date.now() - lastActivity;
+
+
+
+        if (
+            playTime >
+            25 * 60 * 1000
+        ) {
+
+
+            displayAd();
+
+
+
+            lastActivity =
+                Date.now();
+
+
+        }
+
+
+    }
+
+
+}
+
+
+
+// Display ad
+function displayAd() {
+
+
+    adModal.style.display =
+        'flex';
+
+
+
+    let adCountdown = 15;
+
+    let skipCountdown = 5;
+
+
+
+    const adCountdownElement =
+        document.getElementById(
+            'adCountdown'
+        );
+
+
+    const skipTimerElement =
+        document.getElementById(
+            'skipTimer'
+        );
+
+
+    const skipAdBtn =
+        document.getElementById(
+            'skipAdBtn'
+        );
+
+
+
+    adTimer =
+        setInterval(() => {
+
+
+            adCountdown--;
+
+
+
+            adCountdownElement.textContent =
+                adCountdown;
+
+
+
+            if (skipCountdown > 0) {
+
+
+                skipCountdown--;
+
+
+                skipTimerElement.textContent =
+                    skipCountdown;
+
+
+            } else {
+
+
+                skipAdBtn.disabled =
+                    false;
+
+
+
+                skipAdBtn.textContent =
+                    'Skip Ad';
+
+
+            }
+
+
+
+            if (adCountdown <= 0) {
+
+
+                clearInterval(
+                    adTimer
+                );
+
+
+                closeAd();
+
+
+            }
+
+
+
+        }, 1000);
+
+
+
+}
+
+
+
+
+
+
+// Skip ad
+function skipAd() {
+
+    clearInterval(
+        adTimer
+    );
+
+
+    closeAd();
+
+}
+
+
+
+// Close ad
+function closeAd() {
+
+    adModal.style.display =
+        'none';
+
+
+
+    // Reward player for watching ad
+
+    if (isLoggedIn) {
+
+
+        userPoints += 10;
+
+
+
+        currentUser.points =
+            userPoints;
+
+
+
+        localStorage.setItem(
+            'drawaria2_user',
+            JSON.stringify(currentUser)
+        );
+
+
+
+        pointsCount.textContent =
+            userPoints;
+
+
+
+        showSuccessMessage(
+            'Thanks for watching! You earned 10 points.'
+        );
+
+
+    }
+
+
+}
+
+
+
+// Start AFK monitoring for game
+function startGameAfkMonitoring() {
+
+
+    // Reset activity timer when game starts
+
+    resetActivityTimer();
+
+
+}
+
+
+
+// Utility success message
+function showSuccessMessage(message) {
+
+
+    console.log(
+        'Success: ' + message
+    );
+
+
+    alert(message);
+
+
+}
+
+
+
+// Utility info message
+function showInfoMessage(message) {
+
+
+    console.log(
+        'Info: ' + message
+    );
+
+
+    alert(message);
+
+
+}
+
+
+
+// Close modals when clicking outside
+
+window.addEventListener(
+    'click',
+    function(e) {
+
+
+        if (
+            e.target.classList.contains(
+                'modal'
+            )
+        ) {
+
+
+            closeAllModals();
+
+
+        }
+
+
+    }
+);
+
+
+
+// Export functions for other modules
+
+window.Drawaria2 = {
+
+
+    joinGameRoom,
+
+
+    createGameRoom,
+
+
+    showAdModal,
+
+
+    closeAllModals,
+
+
+    getCurrentUser: () => currentUser,
+
+
+    isLoggedIn: () => isLoggedIn
+
+
+};
+
