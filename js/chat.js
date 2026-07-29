@@ -59,7 +59,7 @@ function handleCorrectGuess(guesser) {
     }
 }
 
-// Add player message to chat
+// Add player message
 function addPlayerMessage(sender, message) {
     const chatMessages = document.getElementById('chatMessages');
     const messageElement = document.createElement('div');
@@ -99,7 +99,6 @@ function simulateResponse(message) {
         }, 1000 + Math.random() * 3000);
     }
 }
-
 // Get a random player (for demo)
 function getRandomPlayer() {
     const players = ['ArtMaster123', 'CreativeKid', 'DrawPro', 'SketchWizard'];
@@ -143,3 +142,5 @@ window.ChatManager = {
     sendMessage,
     addPlayerMessage
 };
+
+
